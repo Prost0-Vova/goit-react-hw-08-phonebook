@@ -1,20 +1,23 @@
 import React from 'react';
 import { ListItem, Button } from '../ContactList.styled';
-import { useDeleteContactFromFilterMutation } from 'redux/contactsapi';
+import Notiflix from 'notiflix';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/contactsAsyncActions';
+
 
 function ContactItem({ id, name, number }) {
+  const dispatch = useDispatch();
 
-
-  const [deleteContactFromFilter] = useDeleteContactFromFilterMutation();
+ 
 
   const removeContact = async () => {
     try {
 
-      await deleteContactFromFilter(id);
+      await dispatch(deleteContact(id));
       
-      alert("successful")
+      Notiflix.Notify.success("Successful")
     } catch (error) {
-      alert('an error occured during delete process');
+      Notiflix.Notify.failure("Error");
     }
   };
   return (

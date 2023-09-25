@@ -1,25 +1,28 @@
 import React from 'react';
 
 import ContactItem from './ContactItem/ContactItem';
+
 import { useSelector } from 'react-redux';
-import { getFilter } from 'redux/selectors';
+import { selectContacts, selectContactsFilter } from 'redux/selectors';
+
 import {ContList} from './ContactList.styled';
-import {  useGetFilterQuery } from 'redux/contactsapi';
+
 
 function ContactList() {
 
-  const filter = useSelector(getFilter);
+  const filter = useSelector(selectContactsFilter);
+  const contacts = useSelector(selectContacts);
 
-  const { data: filteredContacts, isLoading, isError } = useGetFilterQuery(filter);
 
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!contacts) {
+    return null;
   }
 
-  if (isError) {
-    return <div>Error loading contacts</div>;
-  }
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+ 
 
   return (
     <ContList>

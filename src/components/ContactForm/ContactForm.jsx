@@ -1,80 +1,108 @@
 import { useState } from 'react';
-import {
-  useAddContactToFilterMutation,
-  useGetContactsQuery,
-} from 'redux/contactsapi';
-import { Form, Input, Button } from './ContactForm.styled';
+
+import Notiflix from 'notiflix';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsAsyncActions';
+import { selectContacts } from 'redux/selectors';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Button, Container, TextField, Typography } from '@mui/material';
 
 function ContactForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const { data: contacts } = useGetContactsQuery();
-  const [addContactToFilter] = useAddContactToFilterMutation();
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const initialValues = {
+    name: '',
+    number: '',
+  };
+
 
 
   const validateContact = (name, number) => {
+    if (!contacts || !Array.isArray(contacts)) {
+      return false;
+    }
     return contacts.some(
-      contact => contact.name.toLowerCase() === name.toLowerCase() || contact.number === number
+      contact => (
+        contact.name.toLowerCase() === name.toLowerCase() ||
+        contact.number === number
+      )
     );
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
 
     const isValidateContact = validateContact(name, number);
 
     if (isValidateContact) {
-      alert(`${name} is already in contacts.`);
+      Notiflix.Notify.failure(`${name} is already in contacts.`)
       return;
     }
 
-   
-
     try {
-      const response =  await addContactToFilter({ name, number });
+      const response = await dispatch(addContact({ name, number: number }));
 
-      if (response.error) {
-        alert("Error"); 
-        return;
+      if (addContact.fulfilled.match(response)) {
+        setName("")
+        setNumber("")
+        Notiflix.Notify.success("Success");
+      } else {
+        Notiflix.Notify.failure("Failed");
       }
-      alert("Successful")
-      setName('');
-      setNumber('');
     } catch (error) {
-      alert("Error");
-      
-      
+      Notiflix.Notify.failure("Error");
     }
   };
 
-  const handleNameChange = e => {
-    setName(e.target.value);
-  };
-
-  const handleNumberChange = e => {
-    setNumber(e.target.value);
-  };
 
   return (
-    <Form onSubmit={handleSubmit} >
-      <input
-        type="text"
-        name="name"
-        placeholder="Name"
-        value={name}
-        onChange={handleNameChange}
-        required
-      />
-      <Input
-        type="tel"
-        name="number"
-        placeholder="Phone Number"
-        value={number}
-        onChange={handleNumberChange}
-        required
-      />
-      <Button type="submit">Add contact</Button>
-    </Form>
+  <Container maxWidth="xs">
+      <Typography
+        variant="h2"
+        align="center"
+        gutterBottom
+        sx={{ marginTop: 8}}
+      >
+      
+      </Typography>
+      <Formik
+      initialValues={initialValues}
+        onSubmit={handleSubmit}
+      >
+        <Form>
+          <Field
+            as={TextField}
+            fullWidth
+            id="name"
+            name="name"
+            label="Name"
+            variant="outlined"
+            margin="normal"
+            helperText={<ErrorMessage name="name" />}
+          />
+          <Field
+            as={TextField}
+            fullWidth
+            id="number"
+            name="number"
+            label="Number"
+            variant="outlined"
+            margin="normal"
+            helperText={<ErrorMessage name="number" />}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            size="medium"
+            sx={{ mt: 2 }}
+          >
+            Add Contact
+          </Button>
+        </Form>
+      </Formik>
+    </Container>
   );
 }
 
