@@ -12,7 +12,9 @@ function ContactList() {
 
   const filter = useSelector(selectContactsFilter);
   const contacts = useSelector(selectContacts);
-
+  if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
+    return null;
+  }
 
   if (!contacts) {
     return null;

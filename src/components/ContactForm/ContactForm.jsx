@@ -19,7 +19,7 @@ function ContactForm() {
 
 
 
-  const validateContact = (name, number) => {
+  const validateContact = () => {
     if (!contacts || !Array.isArray(contacts)) {
       return false;
     }
@@ -31,7 +31,8 @@ function ContactForm() {
     );
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (values) => {
+    const {name, number} = values;
 
     const isValidateContact = validateContact(name, number);
 
@@ -41,7 +42,7 @@ function ContactForm() {
     }
 
     try {
-      const response = await dispatch(addContact({ name, number: number }));
+      const response = await dispatch(addContact({ name, number }));
 
       if (addContact.fulfilled.match(response)) {
         setName("")
@@ -53,7 +54,10 @@ function ContactForm() {
     } catch (error) {
       Notiflix.Notify.failure("Error");
     }
+
+    
   };
+
 
 
   return (
@@ -80,6 +84,7 @@ function ContactForm() {
             variant="outlined"
             margin="normal"
             helperText={<ErrorMessage name="name" />}
+            
           />
           <Field
             as={TextField}
@@ -90,6 +95,7 @@ function ContactForm() {
             variant="outlined"
             margin="normal"
             helperText={<ErrorMessage name="number" />}
+            
           />
           <Button
             type="submit"

@@ -3,7 +3,7 @@ import {
   fetchContacts,
   addContact,
   deleteContact,
-} from './contactsAsyncActions';
+} from '../contactsAsyncActions';
 
 const handlePending = state => {
   state.isLoading = true;

@@ -25,11 +25,7 @@ export function App() {
   ) : (
     <Routes>
       <Route path="/" element={<Layout />}>
-        {isAuthenticated ? (
-          <Route index element={<Navigate to="/contacts" />} />
-        ) : (
-          <Route index element={<Home />} />
-        )}
+      <Route index element={<Home />} />
         <Route
           path="register"
           element={
@@ -42,7 +38,7 @@ export function App() {
         <Route
           path="login"
           element={
-            <RestrictedRoute redirectTo="/contacts" component={<Login />} />
+            <RestrictedRoute index element={<Navigate to="/contacts" />} component={<Login />} />
           }
         />
         <Route
